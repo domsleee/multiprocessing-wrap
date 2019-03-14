@@ -1,5 +1,6 @@
 from tqdm import tqdm
 import multiprocessing
+import traceback
 
 MANAGER = multiprocessing.Manager()
 
@@ -32,19 +33,22 @@ class MultiProcess:
       self.pool.imap_unordered(my_worker, self.jobs)
     else:
       for _ in enumerate(self.pool.imap_unordered(my_worker, self.jobs)):
+        self._check_for_exceptions()
         pbar.update(1)
     
-    pbar.close()
-
     # Raise exceptions, if there were any
+    self._check_for_exceptions()
+    pbar.close()
+    self._reset() 
+  
+  def _check_for_exceptions(self):
     if not self.errQ.empty():
       exceptions = []
       while not self.errQ.empty():
         exceptions.append(self.errQ.pop())
+      self._reset()
       raise MultiProcessException('%s errors occurred:\n' % len(exceptions) + "\n".join(['ERROR: ' + str(e) for e in exceptions]))
-    
-    self._reset() 
-  
+
   def close(self):
     self.pool.close()
 
@@ -55,8 +59,8 @@ def my_worker(args):
   remArgs = args[2:]
   try:
     fn(*remArgs)
-  except Exception as e:
-    errQ.push(e)
+  except Exception:
+    errQ.push('Error in function call "%s%s"\n%s' % (fn.__name__, remArgs, traceback.format_exc()))
 
 
 """A lightweight wrapper for multiprocess.manager.Queue()"""
@@ -81,3 +85,7 @@ class Queue:
   
   def empty(self):
     return self.q.empty()
+  
+  def qsize(self):
+    return self.q.qsize()
+  
