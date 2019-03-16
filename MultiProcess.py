@@ -1,6 +1,7 @@
 from tqdm import tqdm
 import multiprocessing
 import traceback
+import dill
 
 MANAGER = multiprocessing.Manager()
 
@@ -13,6 +14,7 @@ class MultiProcess:
     self.jobs = []
     self.show_loading_bar = show_loading_bar
     self.errQ = Queue()
+    self.alive = True
 
   def _reset(self):
     while not self.errQ.empty():
@@ -21,10 +23,13 @@ class MultiProcess:
 
   def add_tasks(self, fn, arr_of_args):
     """add tasks to be done"""
-    self.jobs += [(fn, self.errQ) + args for args in arr_of_args]
+    arr = [dill.dumps((fn, self.errQ) + (args)) for args in arr_of_args]
+    self.jobs += arr
 
   def do_tasks(self):
     """Block the thread and complete the tasks"""
+    if not self.alive:
+      return
     job_count = len(self.jobs)
     if self.show_loading_bar:
       pbar = tqdm(total=job_count)
@@ -46,21 +51,26 @@ class MultiProcess:
       exceptions = []
       while not self.errQ.empty():
         exceptions.append(self.errQ.pop())
+      self.alive = False
+      self.close()
       self._reset()
       raise MultiProcessException('%s errors occurred:\n' % len(exceptions) + "\n".join(['ERROR: ' + str(e) for e in exceptions]))
 
   def close(self):
+    self.do_tasks()
+    self.alive = False
     self.pool.close()
 
 
 def my_worker(args):
+  args = dill.loads(args)
   fn = args[0]
   errQ = args[1]
   remArgs = args[2:]
   try:
     fn(*remArgs)
   except Exception:
-    errQ.push('Error in function call "%s%s"\n%s' % (fn.__name__, remArgs, traceback.format_exc()))
+    errQ.push('Error in function call "%s(%s)"\n%s' % (fn.__name__, remArgs, traceback.format_exc()))
 
 
 """A lightweight wrapper for multiprocess.manager.Queue()"""
