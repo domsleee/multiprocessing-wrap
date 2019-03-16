@@ -23,13 +23,18 @@ class MultiProcess:
 
   def add_tasks(self, fn, arr_of_args):
     """add tasks to be done"""
+    if not self.alive:
+      raise MultiProcessException(".close() has been called, refusing to add tasks")
     arr = [dill.dumps((fn, self.errQ) + (args)) for args in arr_of_args]
     self.jobs += arr
 
-  def do_tasks(self):
+  def do_tasks(self, called_from_close=False):
     """Block the thread and complete the tasks"""
     if not self.alive:
-      return
+      if called_from_close:
+        return
+      else:
+        raise MultiProcessException('do_tasks called after closing')
     job_count = len(self.jobs)
     if self.show_loading_bar:
       pbar = tqdm(total=job_count)
@@ -51,13 +56,12 @@ class MultiProcess:
       exceptions = []
       while not self.errQ.empty():
         exceptions.append(self.errQ.pop())
-      self.alive = False
-      self.close()
       self._reset()
+      self.close()
       raise MultiProcessException('%s errors occurred:\n' % len(exceptions) + "\n".join(['ERROR: ' + str(e) for e in exceptions]))
 
   def close(self):
-    self.do_tasks()
+    self.do_tasks(True)
     self.alive = False
     self.pool.close()
 

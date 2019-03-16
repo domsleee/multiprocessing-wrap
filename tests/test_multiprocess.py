@@ -8,7 +8,6 @@ def test_empty_fn():
   m.add_tasks(f, [()])
   m.do_tasks()
   m.close()
-  assert(1 == 1)
 
 def test_queue():
   q = Queue()
@@ -22,7 +21,7 @@ def test_queue():
   assert(q.pop() == 1)
   assert(q.qsize() == 0)
 
-def test_error():
+def test_fn_raises_exc_is_caught():
   m = MultiProcess()
   def f():
     raise ValueError('unique')
@@ -56,7 +55,7 @@ def test_multiple_tasks():
   l = [q.pop() for v in range(q.qsize())]
   assert(set(l) == set(arr))
 
-def test_close_does_all_tasks():
+def test_close_does_calls_do_task():
   def f(q):
     q.push(1)
   q = Queue()
@@ -84,22 +83,29 @@ def test_close_twice_doesnt_raise_exc():
   m.close()
   m.close()
 
-def test_do_tasks_after_error_doesnt_raise_exc():
+def test_do_tasks_after_error_raises_exc():
   def f():
     raise ValueError('error')
   m = MultiProcess()
   m.add_tasks(f, [()])
   with pytest.raises(MultiProcessException):
     m.do_tasks()
-  m.do_tasks()
+  with pytest.raises(MultiProcessException):
+    m.do_tasks()
   m.close()
 
-def test_add_after_close_raises_exc():
+def test_add_tasks_after_close_raises_exc():
   m = MultiProcess()
   m.close()
   f = lambda: 1
-  m.close()
   with pytest.raises(MultiProcessException):
     m.add_tasks(f, [()])
   
+def test_do_tasks_after_close_raises_exc():
+  m = MultiProcess()
+  f = lambda: 1
+  m.add_tasks(f, [()])
+  m.close()
+  with pytest.raises(MultiProcessException):
+    m.do_tasks()
 
