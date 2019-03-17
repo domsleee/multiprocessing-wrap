@@ -19,12 +19,9 @@ To install using pip:
 pip install multiprocessing-wrap
 ~~~
 
-
-
-
 ## Usage
 
-You can use the functional `multiprocess` for one line multiprocessing:
+You can use the functional `multiprocess` for single line multiprocessing:
 
 ~~~python
 from multiprocess import multiprocess
@@ -33,13 +30,13 @@ f = lambda: print(1)
 multiprocess(f, [(), (), ()])
 ~~~
 
-> ~~~bash
-> 1  
-> 1  
-> 1
-> ~~~
+~~~bash
+1  
+1  
+1
+~~~
 
-Otherwise you can use the `Multiprocess` class to use the more explicit `add_tasks` and `do_tasks` directives.:
+Otherwise you can use the `Multiprocess` class to use the more explicit `add_tasks` and `do_tasks` directives:
 
 ~~~python
 from multiprocess import Multiprocess
@@ -51,7 +48,7 @@ m.do_tasks() # blocking
 m.close()
 ~~~
 
-A more involved example of sorting numbers using `sleep`. Note that you only have as many workers as you have threads, so if you have 4 threads you will only be able to sort up to 4 numbers with this approach:
+A more involved example of sorting numbers using `sleep`. Since the worker function is run in a different process, to transfer data between the processes we use a thread-safe `Queue`. Note the following only works if you have at least 2 threads:
 ~~~python
 from multiprocess import multiprocess, Queue
 from time import sleep
@@ -62,7 +59,7 @@ def sleep_sort():
     sleep(x)
     q.push(x)
   
-  multiprocess(f, [(q, 1,), (q, 2,), (q, 1.5,)])
+  multiprocess(f, [(q, 1,), (q, 2,)])
   print('SORTED')
   while not q.empty():
     print(q.pop())
@@ -70,11 +67,10 @@ def sleep_sort():
 sleep_sort()
 ~~~
 
-> ~~~bash 
-> 1  
-> 1.5  
-> 2
-> ~~~
+~~~bash 
+1  
+2
+~~~
 
 ## Error handling
 Errors from within a process are propagated back to the parent with stack information. For example:
@@ -91,21 +87,19 @@ m.do_tasks()
 m.close()
 ~~~
 
-> ~~~bash
-> Traceback (most recent call last):
->   File "./example3.py", line 9, in <module>
->     m.do_tasks()
->   File "/Users/dom/Documents/git/Multiprocess/src/multiprocess.py", line 53, in do_tasks
->     self._check_for_exceptions()
->   File "/Users/dom/Documents/git/Multiprocess/src/multiprocess.py", line 71, in _check_for_exceptions
->     "\n".join(['ERROR: ' + str(e) for e in exceptions]))
-> multiprocess.MultiprocessException: 1 errors occurred:
-> ERROR: Error in function call "f((1,))"
-> Traceback (most recent call last):
->   File "/Users/dom/Documents/git/Multiprocess/src/multiprocess.py", line 85, in my_worker
->     fn(*rem_args)
->   File "./example3.py", line 6, in f
->     raise ValueError('bad error')
-> ValueError: bad error
-> ~~~
+~~~bash
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/dom/Documents/git/Multiprocess/multiprocess/multiprocessClass.py", line 61, in do_tasks
+    self._check_for_exceptions()
+  File "/Users/dom/Documents/git/Multiprocess/multiprocess/multiprocessClass.py", line 79, in _check_for_exceptions
+    "\n".join(['ERROR: ' + str(e) for e in exceptions]))
+multiprocess.multiprocessClass.MultiprocessProcessException: 1 errors occurred:
+ERROR: Error in function call "f((1,))"
+Traceback (most recent call last):
+  File "/Users/dom/Documents/git/Multiprocess/multiprocess/multiprocessClass.py", line 95, in my_worker
+    fn(*rem_args)
+  File "<stdin>", line 2, in f
+ValueError: bad errorr
+~~~
 
