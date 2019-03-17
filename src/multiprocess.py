@@ -8,7 +8,7 @@ from tqdm import tqdm
 MANAGER = multiprocessing.Manager()
 
 
-class MultiProcessException(Exception):
+class MultiprocessException(Exception):
   """Error thrown by this module"""
 
 
@@ -31,7 +31,7 @@ class Multiprocess:
   def add_tasks(self, function, arr_of_args):
     """add tasks to be done"""
     if not self.alive:
-      raise MultiProcessException("CLOSED, refusing to add tasks")
+      raise MultiprocessException("CLOSED, refusing to add tasks")
     arr = [dill.dumps((function, self.err_q) + (args)) for args in arr_of_args]
     self.jobs += arr
 
@@ -40,7 +40,8 @@ class Multiprocess:
     if not self.alive:
       if called_from_close:
         return
-      raise MultiProcessException('CLOSED, refusing to do tasks')
+      raise MultiprocessException('CLOSED, refusing to do tasks')
+    pbar = None
     job_count = len(self.jobs)
     if self.show_loading_bar:
       pbar = tqdm(total=job_count)
@@ -54,7 +55,8 @@ class Multiprocess:
 
     # Raise exceptions, if there were any
     self._check_for_exceptions()
-    pbar.close()
+    if pbar:
+      pbar.close()
     self._reset()
 
   def _check_for_exceptions(self):
@@ -64,13 +66,13 @@ class Multiprocess:
         exceptions.append(self.err_q.pop())
       self._reset()
       self.close()
-      raise MultiProcessException(
+      raise MultiprocessException(
           '%s errors occurred:\n' % len(exceptions) +
           "\n".join(['ERROR: ' + str(e) for e in exceptions]))
 
   def close(self):
-    self.do_tasks(True)
     self.alive = False
+    self.do_tasks(True)
     self.pool.close()
 
 
