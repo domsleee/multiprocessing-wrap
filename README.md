@@ -3,19 +3,26 @@
 [![Build Status](https://travis-ci.org/domsleee/multiprocessing-wrap.svg?branch=master)](https://travis-ci.org/domsleee/multiprocessing-wrap)
 [![PyPI shield](https://img.shields.io/pypi/v/multiprocessing-wrap.svg?style=flat-square)](https://pypi.org/project/multiprocessing-wrap/)
 
-A simple interface for writing concurrent scripts.
+A simple interface for writing concurrent scripts. Get the most out of `multiprocessing` without all the boilerplate and confusing syntax!
 
-## Installation
+## Features
 
-To install using pip:
-
-~~~bash
-pip install multiprocessing-wrap
-~~~
+* Sensible error propagation - having a stack trace showing where your code speeds debugging and development
+* Built-in loading bar as default using [tqdm](https://github.com/tqdm/tqdm)
+* Uses [dill](https://github.com/uqfoundation/dill) for pickling, which extends the types that can be passed to your workers (see [here](http://docs.python.org/library/pickle.html#what-can-be-pickled-and-unpickled) for documentation of the limitations of python's default pickling)
 
 ## Usage
 
-A simple example that prints out three `1`s:
+You can use the functional `multiprocess` for one line multiprocessing:
+
+~~~python
+from multiprocess import multiprocess
+
+f = lambda: print(1)
+multiprocess(f, [(), (), ()])
+~~~
+
+Otherwise you can use the `Multiprocess` class for more explicit commands:
 
 ~~~python
 from multiprocess import Multiprocess
@@ -49,6 +56,15 @@ def sleep_sort():
 
 sleep_sort()
 ~~~
+
+## Installation
+
+To install using pip:
+
+~~~bash
+pip install multiprocessing-wrap
+~~~
+
 
 
 ## Error handling
