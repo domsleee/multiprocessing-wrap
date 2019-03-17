@@ -7,7 +7,7 @@ A simple interface for writing concurrent scripts.
 To install using pip:
 
 ~~~bash
-pip install multiprocess
+pip install multiprocessing-wrap
 ~~~
 
 ## Usage
