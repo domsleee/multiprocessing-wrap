@@ -15,6 +15,7 @@ setup(
         'multiprocess'
     ],
     package_dir={'': 'src'},
+    install_requires=['tqdm', 'dill'],
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
