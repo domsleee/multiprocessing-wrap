@@ -1,3 +1,5 @@
+"""This module is a light wrapper for the `multiprocessing` module
+"""
 import multiprocessing
 import traceback
 import dill
@@ -7,10 +9,13 @@ MANAGER = multiprocessing.Manager()
 
 
 class MultiProcessException(Exception):
-  pass
+  """Error thrown by this module"""
 
 
-class MultiProcess:
+class Multiprocess:
+  """This class offers the functionality of multiprocessing,
+  with inbuilt error support and a simple interface"""
+
   def __init__(self, show_loading_bar=True):
     self.pool = multiprocessing.Pool()
     self.jobs = []
@@ -23,11 +28,11 @@ class MultiProcess:
       self.err_q.pop()
     self.jobs = []
 
-  def add_tasks(self, fn, arr_of_args):
+  def add_tasks(self, function, arr_of_args):
     """add tasks to be done"""
     if not self.alive:
       raise MultiProcessException("CLOSED, refusing to add tasks")
-    arr = [dill.dumps((fn, self.err_q) + (args)) for args in arr_of_args]
+    arr = [dill.dumps((function, self.err_q) + (args)) for args in arr_of_args]
     self.jobs += arr
 
   def do_tasks(self, called_from_close=False):
@@ -81,10 +86,9 @@ def my_worker(args):
                (fn.__name__, rem_args, traceback.format_exc()))
 
 
-"""A lightweight wrapper for multiprocess.manager.Queue()"""
-
-
 class Queue:
+  """A lightweight wrapper for multiprocess.manager.Queue()"""
+
   def __init__(self):
     self.q = MANAGER.Queue()
     #for method in dir(self.q):
