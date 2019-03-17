@@ -43,6 +43,8 @@ class Multiprocess:
       raise MultiprocessException('CLOSED, refusing to do tasks')
     pbar = None
     job_count = len(self.jobs)
+    if job_count == 0:
+      return
     if self.show_loading_bar:
       pbar = tqdm(total=job_count)
 
@@ -71,8 +73,8 @@ class Multiprocess:
           "\n".join(['ERROR: ' + str(e) for e in exceptions]))
 
   def close(self):
-    self.alive = False
     self.do_tasks(True)
+    self.alive = False
     self.pool.close()
 
 

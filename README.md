@@ -42,7 +42,7 @@ def sleep_sort():
   m.close()
   print('SORTED')
   while not q.empty():
-    print(q.top())
+    print(q.pop())
 
 sleep_sort()
 ~~~
