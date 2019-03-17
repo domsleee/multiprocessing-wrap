@@ -1,4 +1,4 @@
-# multiprocess
+# multiprocessing_wrap
 
 A simple interface for writing concurrent scripts.
 
@@ -15,7 +15,7 @@ pip install multiprocess
 A simple example that prints out three `1`s:
 
 ~~~python
-from multiprocess import Multiprocess
+from multiprocessing_wrap import Multiprocess
 
 m = Multiprocess(show_loading_bar=False)
 def f():
@@ -27,7 +27,7 @@ m.close()
 
 A more involved example of sorting numbers using `sleep`. Note that you only have as many workers as you have threads, so if you have 4 threads you will only be able to sort up to 4 numbers with this approach:
 ~~~python
-from multiprocess import Multiprocess, Queue
+from multiprocessing_wrap import Multiprocess, Queue
 from time import sleep
 
 def sleep_sort():
@@ -52,7 +52,7 @@ sleep_sort()
 Errors from within a process are propagated back to the parent with stack information. For example
 
 ~~~python
-from multiprocess import Multiprocess
+from multiprocessing_wrap import Multiprocess
 
 m = Multiprocess()
 def f(x):

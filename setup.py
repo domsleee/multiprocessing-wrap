@@ -4,9 +4,9 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="multiprocess",
+    name="multiprocessing_wrap",
     version="0.0.1",
-    description="A better way to run shell commands in Python.",
+    description="Easier multiprocessing",
     author='Dominic Slee',
     author_email='domslee1@gmail.com',
     long_description=long_description,
@@ -19,6 +19,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
-    #url='TODO',
-    #license='BSD'
+    url='https://github.com/domsleee/multiprocess',
+    license='BSD'
 )
