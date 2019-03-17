@@ -1,5 +1,7 @@
 # multiprocessing_wrap
 
+[![Build Status](https://travis-ci.org/domsleee/multiprocessing-wrap.svg?branch=master)](https://travis-ci.org/domsleee/multiprocessing-wrap)
+
 A simple interface for writing concurrent scripts.
 
 ## Installation
