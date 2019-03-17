@@ -1,6 +1,7 @@
 # multiprocessing_wrap
 
 [![Build Status](https://travis-ci.org/domsleee/multiprocessing-wrap.svg?branch=master)](https://travis-ci.org/domsleee/multiprocessing-wrap)
+[![PyPI shield](https://img.shields.io/pypi/v/multiprocessing-wrap.svg?style=flat-square)](https://pypi.org/project/multiprocessing-wrap/)
 
 A simple interface for writing concurrent scripts.
 
