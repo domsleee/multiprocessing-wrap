@@ -1,5 +1,4 @@
-import pytest
-from multiprocess import Multiprocess, Queue, MultiprocessException
+from multiprocess import Multiprocess
 
 
 def test_stdout(capsys):
