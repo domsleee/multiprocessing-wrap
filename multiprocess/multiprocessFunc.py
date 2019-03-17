@@ -1,4 +1,4 @@
-from .Multiprocess import Multiprocess
+from multiprocess import Multiprocess
 
 def multiprocess(fn, arr_of_args, **kwargs):
   """Execute several tasks in parallel. Requires a function `fn`

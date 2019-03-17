@@ -11,6 +11,7 @@ twine = "*"
 dill = "*"
 tqdm = "*"
 multiprocess = {editable = true,path = "."}
+multiprocessing-wrap = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"

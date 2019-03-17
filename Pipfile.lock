@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2cbde3b6a046dd9e5899e56b1d1369efbf5b4cbae3e8eb46d097a57efc770972"
+            "sha256": "765495e143f8bdc55de845fdbb298f7e5b119d43b29c16fed9a4b571fc8af8ea"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -24,6 +24,10 @@
             "version": "==0.2.9"
         },
         "multiprocess": {
+            "editable": true,
+            "path": "."
+        },
+        "multiprocessing-wrap": {
             "editable": true,
             "path": "."
         },
