@@ -8,13 +8,19 @@ from tqdm import tqdm
 MANAGER = multiprocessing.Manager()
 
 
-class MultiprocessException(Exception):
-  """Error thrown by this module"""
+class MultiprocessProcessException(Exception):
+  """Error thrown by at least one process in the pool"""
+
+class MultiprocessClosed(Exception):
+  """An action was made after `close()` has been called"""
 
 
 class Multiprocess:
   """This class offers the functionality of multiprocessing,
-  with inbuilt error support and a simple interface"""
+  with inbuilt error support and a simple interface.
+
+  Optionally accepts `show_loading_bar`, a boolean indicating if
+  a loading bar will be output to the console when calling `do_tasks`"""
 
   def __init__(self, show_loading_bar=True):
     self.pool = multiprocessing.Pool()
@@ -29,18 +35,18 @@ class Multiprocess:
     self.jobs = []
 
   def add_tasks(self, function, arr_of_args):
-    """add tasks to be done"""
+    """Add tasks to the object"""
     if not self.alive:
-      raise MultiprocessException("CLOSED, refusing to add tasks")
+      raise MultiprocessClosed('CLOSED, refusing to add tasks')
     arr = [dill.dumps((function, self.err_q) + (args)) for args in arr_of_args]
     self.jobs += arr
 
   def do_tasks(self, called_from_close=False):
-    """Block the thread and complete the tasks"""
+    """Block the thread and complete the tasks added with `add_tasks`"""
     if not self.alive:
       if called_from_close:
         return
-      raise MultiprocessException('CLOSED, refusing to do tasks')
+      raise MultiprocessClosed('CLOSED, refusing to do tasks')
     pbar = None
     job_count = len(self.jobs)
     if job_count == 0:
@@ -68,11 +74,13 @@ class Multiprocess:
         exceptions.append(self.err_q.pop())
       self._reset()
       self.close()
-      raise MultiprocessException(
+      raise MultiprocessProcessException(
           '%s errors occurred:\n' % len(exceptions) +
           "\n".join(['ERROR: ' + str(e) for e in exceptions]))
 
   def close(self):
+    """Closes the manager. After closing, `add_tasks` and `do_tasks` will throw
+    a `MultiprocessClosed` error"""
     self.do_tasks(True)
     self.alive = False
     self.pool.close()

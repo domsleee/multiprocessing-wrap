@@ -1,5 +1,5 @@
 import pytest
-from multiprocess import Multiprocess, Queue, MultiprocessException
+from multiprocess import Multiprocess, Queue, MultiprocessProcessException, MultiprocessClosed
 
 
 def test_empty_fn():
@@ -34,7 +34,7 @@ def test_fn_raises_exc_is_caught():
     raise ValueError('unique')
 
   m.add_tasks(f, [()])
-  with pytest.raises(MultiprocessException) as excinfo:
+  with pytest.raises(MultiprocessProcessException) as excinfo:
     m.do_tasks()
   assert 'unique' in str(excinfo.value)
   m.close()
@@ -109,9 +109,9 @@ def test_do_tasks_after_error_raises_exc():
 
   m = Multiprocess()
   m.add_tasks(f, [()])
-  with pytest.raises(MultiprocessException):
+  with pytest.raises(MultiprocessProcessException):
     m.do_tasks()
-  with pytest.raises(MultiprocessException):
+  with pytest.raises(MultiprocessClosed):
     m.do_tasks()
   m.close()
 
@@ -120,7 +120,7 @@ def test_add_tasks_after_close_raises_exc():
   m = Multiprocess()
   m.close()
   f = lambda: 1
-  with pytest.raises(MultiprocessException):
+  with pytest.raises(MultiprocessClosed):
     m.add_tasks(f, [()])
 
 
@@ -129,7 +129,7 @@ def test_do_tasks_after_close_raises_exc():
   f = lambda: 1
   m.add_tasks(f, [()])
   m.close()
-  with pytest.raises(MultiprocessException):
+  with pytest.raises(MultiprocessClosed):
     m.do_tasks()
 
 def test_no_loading_bar():
