@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setup(
     name="multiprocessing_wrap",
     version="0.0.1",
-    description="Easier multiprocessing",
+    description="Elegant multiprocessing without boilerplate and confusing syntax",
     author='Dominic Slee',
     author_email='domslee1@gmail.com',
     long_description=long_description,
