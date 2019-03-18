@@ -15,7 +15,7 @@ def multiprocess(fn, arr_of_args, **kwargs):
 
     >>> multiprocess(f, [(x,), (y,)], show_loading_bar=False)
   """
-  m = Multiprocess(kwargs)
+  m = Multiprocess(**kwargs)
   m.add_tasks(fn, arr_of_args)
   m.do_tasks()
   m.close()
