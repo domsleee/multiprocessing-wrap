@@ -10,7 +10,9 @@ def test_stdout(capsys):
   m.close()
   out, err = capsys.readouterr()
   assert (out == '')
-  spl = [v.split('\r')[-1] for v in err.split('\n')[1:]]
+  spl = [v.split('\r')[-1] for v in err.split('\n')]
+  while len(spl) and spl[0] == '':
+    spl = spl[1:]
   assert (len(spl) == 2)
   assert (spl[0].startswith('100%'))
   assert (spl[1] == '')
